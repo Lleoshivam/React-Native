@@ -1,20 +1,16 @@
 const express = require("express");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 
 const app = express();
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-// MongoDB connection
+// MongoDB connection string from Render env vars
 const MONGO_URI = process.env.MONGO_URI;
 
-
-
-
-const { MongoClient, ServerApiVersion } = require("mongodb");
-
-const client = new MongoClient(process.env.MONGO_URI, {
+// Mongo client (Atlas-safe config)
+const client = new MongoClient(MONGO_URI, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -22,9 +18,14 @@ const client = new MongoClient(process.env.MONGO_URI, {
   },
 });
 
+let expensesCollection;
+
+// Connect to MongoDB once at startup
 async function connectDB() {
   try {
     await client.connect();
+    const db = client.db("expense-tracker");
+    expensesCollection = db.collection("expenses");
     console.log("MongoDB connected successfully");
   } catch (err) {
     console.error("MongoDB connection failed:", err);
@@ -32,6 +33,7 @@ async function connectDB() {
 }
 
 connectDB();
+
 
 
 let expensesCollection;
