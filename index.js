@@ -34,21 +34,7 @@ async function connectDB() {
 
 connectDB();
 
-
-
-let expensesCollection;
-
-// connect once when server starts
-async function connectDB() {
-  await client.connect();
-  const db = client.db("expense-tracker");
-  expensesCollection = db.collection("expenses");
-  console.log("MongoDB connected");
-}
-
-connectDB().catch(console.error);
-
-// helper to format date dd-mm-yy
+// Helper: current date (dd-mm-yy)
 function getCurrentDate() {
   const d = new Date();
   const dd = String(d.getDate()).padStart(2, "0");
@@ -57,17 +43,14 @@ function getCurrentDate() {
   return `${dd}-${mm}-${yy}`;
 }
 
-/**
- * POST /transactions
- * body: { amount, name, category? }
- */
+// POST: save transaction
 app.post("/transactions", async (req, res) => {
   try {
     const { amount, name, category } = req.body;
 
     if (!amount || !name) {
       return res.status(400).json({
-        error: "amount and name are required"
+        error: "amount and name are required",
       });
     }
 
@@ -76,24 +59,21 @@ app.post("/transactions", async (req, res) => {
       name,
       category: category || "others",
       date: getCurrentDate(),
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     const result = await expensesCollection.insertOne(transaction);
 
     res.status(201).json({
       message: "Transaction saved",
-      id: result.insertedId
+      id: result.insertedId,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-/**
- * GET /transactions
- * returns latest → oldest
- */
+// GET: latest → oldest
 app.get("/transactions", async (req, res) => {
   try {
     const transactions = await expensesCollection
@@ -107,6 +87,7 @@ app.get("/transactions", async (req, res) => {
   }
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
