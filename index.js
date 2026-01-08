@@ -7,8 +7,8 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 // MongoDB connection
-const MONGO_URI =
-  "mongodb+srv://shivamtrivedi:Shivam@123@cluster0.ltpx60z.mongodb.net/?appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI;
+
 
 const client = new MongoClient(MONGO_URI);
 
