@@ -10,7 +10,13 @@ const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
 
+
+
 const client = new MongoClient(MONGO_URI);
+
+client.connect()
+  .then(() => console.log("MongoDB connected successfully"))
+  .catch(err => console.error("MongoDB connection failed:", err));
 
 let expensesCollection;
 
