@@ -7,7 +7,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 // MongoDB connection string from Render env vars
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = "mongodb+srv://shivamtrivedi:Shivam123@cluster0.ltpx60z.mongodb.net/expense-tracker?retryWrites=true&w=majority&tls=true";
 
 // Mongo client (Atlas-safe config)
 const client = new MongoClient(MONGO_URI, {
