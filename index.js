@@ -88,6 +88,62 @@ app.get("/transactions", async (req, res) => {
   }
 });
 
+
+/* =====================================================
+   UPDATE TRANSACTION
+===================================================== */
+app.put("/transactions/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount, name, category } = req.body;
+
+    const updateFields = {};
+    if (amount !== undefined) updateFields.amount = Number(amount);
+    if (name !== undefined) updateFields.name = name;
+    if (category !== undefined) updateFields.category = category;
+
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({
+        error: "At least one field is required to update",
+      });
+    }
+
+    const result = await expensesCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateFields }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+
+    res.json({ message: "Transaction updated" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* =====================================================
+   DELETE TRANSACTION
+===================================================== */
+app.delete("/transactions/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await expensesCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+
+    res.json({ message: "Transaction deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
