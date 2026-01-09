@@ -7,7 +7,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 /**
- * Direct replica-set MongoDB connection (Render-safe)
+ * MongoDB direct replica-set connection (Render safe)
  */
 const MONGO_URI =
   "mongodb://shivamtrivedi:Shivam123@" +
@@ -21,7 +21,7 @@ const client = new MongoClient(MONGO_URI, { tls: true });
 
 let expensesCollection;
 
-// Connect to MongoDB once
+/* ===================== DB CONNECT ===================== */
 async function connectDB() {
   try {
     await client.connect();
@@ -32,10 +32,9 @@ async function connectDB() {
     console.error("MongoDB connection failed:", err);
   }
 }
-
 connectDB();
 
-// Format date: dd-mm-yy
+/* ===================== HELPERS ===================== */
 function getCurrentDate() {
   const d = new Date();
   const dd = String(d.getDate()).padStart(2, "0");
@@ -44,12 +43,12 @@ function getCurrentDate() {
   return `${dd}-${mm}-${yy}`;
 }
 
-// POST: create transaction
+/* ===================== CREATE ===================== */
 app.post("/transactions", async (req, res) => {
   try {
     const { amount, name, category } = req.body;
 
-    if (!amount || !name) {
+    if (amount === undefined || !name) {
       return res.status(400).json({
         error: "amount and name are required",
       });
@@ -66,7 +65,7 @@ app.post("/transactions", async (req, res) => {
     const result = await expensesCollection.insertOne(transaction);
 
     res.status(201).json({
-      message: "Transaction saved",
+      message: "Transaction created",
       id: result.insertedId,
     });
   } catch (err) {
@@ -74,7 +73,7 @@ app.post("/transactions", async (req, res) => {
   }
 });
 
-// GET: latest → oldest
+/* ===================== READ ===================== */
 app.get("/transactions", async (req, res) => {
   try {
     const transactions = await expensesCollection
@@ -88,10 +87,7 @@ app.get("/transactions", async (req, res) => {
   }
 });
 
-
-/* =====================================================
-   UPDATE TRANSACTION
-===================================================== */
+/* ===================== UPDATE ===================== */
 app.put("/transactions/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -123,9 +119,7 @@ app.put("/transactions/:id", async (req, res) => {
   }
 });
 
-/* =====================================================
-   DELETE TRANSACTION
-===================================================== */
+/* ===================== DELETE ===================== */
 app.delete("/transactions/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -144,7 +138,7 @@ app.delete("/transactions/:id", async (req, res) => {
   }
 });
 
-// Start server
+/* ===================== SERVER ===================== */
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
